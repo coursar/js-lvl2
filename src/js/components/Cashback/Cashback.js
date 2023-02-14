@@ -14,11 +14,21 @@ template.innerHTML = `
 export default class CashbackComponent {
   #parentEl;
   #el;
+  #formEl;
 
   constructor(parentEl) {
     this.#parentEl = parentEl;
     this.#el = template.content.cloneNode(true).firstElementChild;
+
+    this.#formEl = this.#el.querySelector('[data-id="form"]');
+    // TODO: потеря контекста (обсудить)
+    this.#formEl.addEventListener('submit', (ev) => this.handleFormSubmit(ev));
+
     this.render();
+  }
+
+  handleFormSubmit(ev) {
+    debugger;
   }
 
   render() {
