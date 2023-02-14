@@ -1,3 +1,5 @@
-// Linux: Ctrl + Shift + I
-// Windows: Shift + Alt + F
-const hello = 'Hello';
+import CashbackComponent from './components/Cashback/Cashback.js';
+
+const rootEl = document.querySelector('#root');
+const cashbackEl = new CashbackComponent(rootEl);
+
