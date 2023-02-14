@@ -3,7 +3,8 @@ template.innerHTML = `
 <div data-widget="cashback-calculator">
   <form data-id="form">
     <div>
-      <input data-id="amount" name="amount" type="number">
+      <input data-id="amount" name="amount">
+      <span data-id="amount-error" class="input-error"></span>
     </div>
     <button>Calculate</button>
     <div data-id="result"></div>
@@ -15,19 +16,39 @@ export default class CashbackComponent {
   #parentEl;
   #el;
   #formEl;
+  #amountInputEl;
+  #amountErrorEl;
 
   constructor(parentEl) {
     this.#parentEl = parentEl;
     this.#el = template.content.cloneNode(true).firstElementChild;
 
+    // !мы не ищем элементы в обработчиках
     this.#formEl = this.#el.querySelector('[data-id="form"]');
     // TODO: потеря контекста (обсудить)
     this.#formEl.addEventListener('submit', (ev) => this.handleFormSubmit(ev));
+
+    this.#amountInputEl = this.#formEl.querySelector('[data-id="amount"]');
+    this.#amountErrorEl = this.#formEl.querySelector('[data-id="amount-error"]');
 
     this.render();
   }
 
   handleFormSubmit(ev) {
+    // default behaviour
+    ev.preventDefault();
+
+    // sync validation
+    const trimmedValue = this.#amountInputEl.value.trim();
+    const numberValue = Number.parseInt(trimmedValue, 10);
+    if (Number.isNaN(numberValue)) {
+      this.#amountErrorEl.textContent = 'Please, enter a number';
+      this.#amountInputEl.focus();
+      // TODO: show error
+      return;
+    }
+    this.#amountErrorEl.textContent = '';
+
     debugger;
   }
 
