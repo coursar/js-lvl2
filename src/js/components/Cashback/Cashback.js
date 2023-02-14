@@ -15,13 +15,19 @@ template.innerHTML = `
 export default class CashbackComponent {
   #parentEl;
   #el;
+
+  #cashbackService;
+
   #formEl;
   #amountInputEl;
   #amountErrorEl;
+  #resultEl;
 
-  constructor(parentEl) {
+  constructor(parentEl, cashbackService) {
     this.#parentEl = parentEl;
     this.#el = template.content.cloneNode(true).firstElementChild;
+
+    this.#cashbackService = cashbackService;
 
     // !мы не ищем элементы в обработчиках
     this.#formEl = this.#el.querySelector('[data-id="form"]');
@@ -30,6 +36,8 @@ export default class CashbackComponent {
 
     this.#amountInputEl = this.#formEl.querySelector('[data-id="amount"]');
     this.#amountErrorEl = this.#formEl.querySelector('[data-id="amount-error"]');
+
+    this.#resultEl = this.#formEl.querySelector('[data-id="result"]');
 
     this.render();
   }
