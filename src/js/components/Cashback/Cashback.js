@@ -45,6 +45,9 @@ export default class CashbackComponent {
   handleFormSubmit(ev) {
     // default behaviour
     ev.preventDefault();
+    this.#resultEl.textContent = '';
+
+    // don't clear on error!
 
     // sync validation
     const trimmedValue = this.#amountInputEl.value.trim();
@@ -56,6 +59,9 @@ export default class CashbackComponent {
       return;
     }
     this.#amountErrorEl.textContent = '';
+
+    const resultValue = this.#cashbackService.calculate(numberValue);
+    this.#resultEl.textContent = `${resultValue} rub.`;
 
     debugger;
   }
