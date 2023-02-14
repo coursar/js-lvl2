@@ -58,6 +58,7 @@ export default class CashbackComponent {
       // TODO: show error
       return;
     }
+    // TODO: check limits & min/max value
     this.#amountErrorEl.textContent = '';
 
     const resultValue = this.#cashbackService.calculate(numberValue);
