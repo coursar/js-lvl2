@@ -44,7 +44,7 @@ export default class CashbackComponent {
     // !мы не ищем элементы в обработчиках
     this.#formEl = this.#el.querySelector('[data-id="form"]');
     // TODO: потеря контекста (обсудить)
-    // this.#formEl.addEventListener('submit', (ev) => this.handleFormSubmit(ev));
+    this.#formEl.addEventListener('submit', (ev) => this.handleFormSubmit(ev));
 
     this.#amountInputEl = this.#formEl.querySelector('[data-id="amount"]');
     this.#amountErrorEl = this.#formEl.querySelector('[data-id="amount-error"]');
@@ -57,26 +57,17 @@ export default class CashbackComponent {
   handleFormSubmit(ev) {
     // default behaviour
     ev.preventDefault();
-    this.#resultEl.textContent = '';
+    const formData = new FormData(ev.target);
+    const urlSearchParams = new URLSearchParams(formData);
 
-    // don't clear on error!
-
-    // sync validation
-    const trimmedValue = this.#amountInputEl.value.trim();
-    const numberValue = Number.parseInt(trimmedValue, 10);
-    if (Number.isNaN(numberValue)) {
-      this.#amountErrorEl.textContent = 'Please, enter a number';
-      this.#amountInputEl.focus();
-      // TODO: show error
-      return;
+    const xhr = new XMLHttpRequest();
+    // setup
+    xhr.open('GET', `http://localhost:9999/?${urlSearchParams.toString()}`, false);
+    xhr.send(); // stop the world!
+    if (xhr.status >= 200 && xhr.status <= 299) {
+      const response = xhr.responseText;
+      debugger;
     }
-    // TODO: check limits & min/max value
-    this.#amountErrorEl.textContent = '';
-
-    const resultValue = this.#cashbackService.calculate(numberValue);
-    this.#resultEl.textContent = `${resultValue} rub.`;
-
-    debugger;
   }
 
   render() {
