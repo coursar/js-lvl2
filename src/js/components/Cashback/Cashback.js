@@ -1,10 +1,22 @@
 const template = document.createElement('template');
 template.innerHTML = `
 <div data-widget="cashback-calculator">
-  <form data-id="form">
+  <form data-id="form" action="http://localhost:9999" method="POST" enctype="multipart/form-data">
     <div>
       <input data-id="amount" name="amount">
       <span data-id="amount-error" class="input-error"></span>
+    </div>
+    <div>
+      <input data-id="charity" name="charity">
+      <span data-id="charity-error" class="input-error"></span>
+    </div>
+    <div>
+      <input data-id="image" name="image" type="file">
+      <span data-id="image-error" class="input-error"></span>
+    </div>
+    <div>
+      <textarea data-id="comment" name="comment"></textarea>
+      <span data-id="comment-error" class="input-error"></span>
     </div>
     <button>Calculate</button>
     <div data-id="result"></div>
@@ -32,7 +44,7 @@ export default class CashbackComponent {
     // !мы не ищем элементы в обработчиках
     this.#formEl = this.#el.querySelector('[data-id="form"]');
     // TODO: потеря контекста (обсудить)
-    this.#formEl.addEventListener('submit', (ev) => this.handleFormSubmit(ev));
+    // this.#formEl.addEventListener('submit', (ev) => this.handleFormSubmit(ev));
 
     this.#amountInputEl = this.#formEl.querySelector('[data-id="amount"]');
     this.#amountErrorEl = this.#formEl.querySelector('[data-id="amount-error"]');

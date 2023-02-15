@@ -3,6 +3,10 @@ import http from 'node:http';
 const server = http.createServer((req, res) => {
   const body = '<h1>HTTP</h1>';
 
+  const url = new URL(req.url, `http://${req.headers.host}`);
+
+  const amount = url.searchParams.get('amount');
+
   res.statusCode = 200;
   res.setHeader('Content-Type', 'text/html');
   res.end(body);
