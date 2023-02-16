@@ -61,23 +61,20 @@ export default class CashbackComponent {
     const urlSearchParams = new URLSearchParams(formData);
 
     const xhr = new XMLHttpRequest();
-    // setup
-    /* query string */
-    xhr.open('GET', `http://localhost:9999/?${urlSearchParams.toString()}`, false);
+    xhr.open('GET', `http://localhost:9999/?${urlSearchParams.toString()}`);
+
+    // response from server
+    // 200, 400, 500, etc
+    xhr.onload = (ev) => {
+      if (ev.target.status >= 200 && xhr.status <= 299) {
+        debugger;
+      }
+    };
+    // network error
+    xhr.onerror = () => {
+        debugger;
+    };
     xhr.send(); // stop the world!
-
-    /* x-www-... */
-    // xhr.open('POST', `http://localhost:9999`, false);
-    // xhr.send(urlSearchParams); // stop the world!
-
-    /* multipart/form-data */
-    // xhr.open('POST', `http://localhost:9999`, false);
-    // xhr.send(formData); // stop the world!
-
-    if (xhr.status >= 200 && xhr.status <= 299) {
-      const response = xhr.responseText;
-      debugger;
-    }
   }
 
   render() {
