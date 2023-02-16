@@ -81,16 +81,19 @@ export default class CashbackComponent {
       // TODO...
     }, 500);
     // setInterval(cb, 1000);
-
+    xhr.send();
 
     // response from server
     // 200, 400, 500, etc
     xhr.onload = (ev) => {
       if (ev.target.status >= 200 && xhr.status <= 299) {
+        // TODO:
       }
+      // TODO:
     };
     // network error
     xhr.onerror = () => {
+      // TODO:
     };
     xhr.onloadend = () => {
       // Bad practice (refactor)
