@@ -7,7 +7,7 @@ const handler = (req, res) => {
 
   const amount = url.searchParams.get('amount');
 
-  res.statusCode = 400;
+  res.statusCode = 200;
   res.setHeader('Content-Type', 'text/html');
   res.end(body);
 };
