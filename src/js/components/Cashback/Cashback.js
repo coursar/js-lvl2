@@ -1,7 +1,7 @@
 const template = document.createElement('template');
 template.innerHTML = `
 <div data-widget="cashback-calculator">
-  <form data-id="form" action="http://localhost:9999" method="POST" enctype="multipart/form-data">
+  <form data-id="form">
     <div>
       <input data-id="amount" name="amount">
       <span data-id="amount-error" class="input-error"></span>
@@ -62,8 +62,18 @@ export default class CashbackComponent {
 
     const xhr = new XMLHttpRequest();
     // setup
+    /* query string */
     xhr.open('GET', `http://localhost:9999/?${urlSearchParams.toString()}`, false);
     xhr.send(); // stop the world!
+
+    /* x-www-... */
+    // xhr.open('POST', `http://localhost:9999`, false);
+    // xhr.send(urlSearchParams); // stop the world!
+
+    /* multipart/form-data */
+    // xhr.open('POST', `http://localhost:9999`, false);
+    // xhr.send(formData); // stop the world!
+
     if (xhr.status >= 200 && xhr.status <= 299) {
       const response = xhr.responseText;
       debugger;
