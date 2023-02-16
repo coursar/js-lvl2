@@ -2,3 +2,17 @@
   height: 20px;
   display: block;
 }
+
+.progress {
+  visibility: hidden;
+  width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  color: #ffffff;
+  text-align: center;
+  white-space: nowrap;
+  transition: width 500ms ease;
+  background-color: #0d6efd;
+}

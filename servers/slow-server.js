@@ -37,7 +37,7 @@ const slow = (next, timeout) => (req, res) => {
   setTimeout(() => next(req, res), timeout);
 };
 
-const server = http.createServer(slow(cors(handler), 5000));
+const server = http.createServer(slow(cors(handler), 20000));
 
 server.on('connection', (socket) => {
   socket.pipe(process.stdout);
