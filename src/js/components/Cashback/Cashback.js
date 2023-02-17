@@ -24,7 +24,7 @@ template.innerHTML = `
       <div data-id="result"></div>
     </fieldset>
   </form>
-  <div data-id="form-error"></div>
+  <div data-id="form-error" class="form-error"></div>
 </div>
 `;
 
@@ -86,7 +86,8 @@ export default class CashbackComponent {
       if (ev.target.status >= 200 && xhr.status <= 299) {
         // TODO:
       }
-      // TODO:
+      // TODO: 4xx-5xx
+      
     };
     // network error
     xhr.onerror = (ev) => {

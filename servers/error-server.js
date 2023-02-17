@@ -5,20 +5,25 @@ let counter = 0;
 const handler = (req, res) => {
   counter++;
 
-  const body = '<h1>HTTP</h1>';
-
   const url = new URL(req.url, `http://${req.headers.host}`);
 
   const amount = url.searchParams.get('amount');
 
   if (counter % 2 === 0) {
-    res.statusCode = 400;
-  } else {
-    res.statusCode = 200;
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({
+      status: 'error',
+      error: 'err.internal', // Max connection limit ... mysql database
+    }));
+    return;
   }
 
-  res.setHeader('Content-Type', 'text/html');
-  res.end(body);
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'application/json');
+  res.end(JSON.stringify({
+    status: 'ok',
+  }));
 };
 
 // middleware
