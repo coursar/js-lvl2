@@ -28,7 +28,7 @@ const handler = (req, res) => {
 
 // middleware
 const cors = (next) => (req, res) => {
-  const {origin} = req.headers;
+  const { origin } = req.headers;
   if (!origin) {
     next(req, res);
     return;

@@ -33,6 +33,7 @@ export default class CashbackComponent {
   #el;
 
   #cashbackService;
+  #errorTranslator;
 
   #formEl;
   #formFieldsEl;
@@ -43,11 +44,12 @@ export default class CashbackComponent {
   #formErrorEl;
   #resultEl;
 
-  constructor(parentEl, cashbackService) {
+  constructor(parentEl, cashbackService, errorTranslator) {
     this.#parentEl = parentEl;
     this.#el = template.content.cloneNode(true).firstElementChild;
 
     this.#cashbackService = cashbackService;
+    this.#errorTranslator = errorTranslator;
 
     // !мы не ищем элементы в обработчиках
     this.#formEl = this.#el.querySelector('[data-id="form"]');
@@ -87,11 +89,18 @@ export default class CashbackComponent {
         // TODO:
       }
       // TODO: 4xx-5xx
-      
+      try {
+        const response = JSON.parse(ev.target.responseText);
+        const errorText = this.#errorTranslator.translate(response.error);
+        this.#formErrorEl.textContent = errorText;
+        return;
+      } catch (e) {
+
+      }
     };
-    // network error
+
     xhr.onerror = (ev) => {
-      this.#formErrorEl.textContent = 'Error, please try again later';
+      this.#formErrorEl.textContent = this.#errorTranslator.translate();
     };
     xhr.onloadend = () => {
       // Bad practice (refactor)
