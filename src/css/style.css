@@ -4,6 +4,10 @@ fieldset {
   padding: 0;
 }
 
+.field-error {
+  border-color: red;
+}
+
 .input-error {
   height: 20px;
   display: block;

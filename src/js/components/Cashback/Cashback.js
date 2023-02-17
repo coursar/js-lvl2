@@ -6,19 +6,19 @@ template.innerHTML = `
     <fieldset data-id="form-fields">
       <div>
         <input data-id="amount" name="amount">
-        <span data-id="amount-error" class="input-error"></span>
+        <span data-id="amount-error" data-name="amount" class="input-error"></span>
       </div>
       <div>
         <input data-id="charity" name="charity">
-        <span data-id="charity-error" class="input-error"></span>
+        <span data-id="charity-error" data-name="charity" class="input-error"></span>
       </div>
       <div>
         <input data-id="image" name="image" type="file">
-        <span data-id="image-error" class="input-error"></span>
+        <span data-id="image-error" data-name="image" class="input-error"></span>
       </div>
       <div>
         <textarea data-id="comment" name="comment"></textarea>
-        <span data-id="comment-error" class="input-error"></span>
+        <span data-id="comment-error" data-name="comment" class="input-error"></span>
       </div>
       <button>Calculate</button>
       <div data-id="result"></div>
@@ -37,6 +37,7 @@ export default class CashbackComponent {
 
   #formEl;
   #formFieldsEl;
+  #formInputEls;
   #formInputErrorEls;
 
   #formProgressEl;
@@ -57,6 +58,7 @@ export default class CashbackComponent {
     this.#formEl.addEventListener('submit', (ev) => this.handleFormSubmit(ev));
     this.#formProgressEl = this.#formEl.querySelector('[data-id="form-progress"]');
     this.#formFieldsEl = this.#formEl.querySelector('[data-id="form-fields"]');
+    this.#formInputEls = [...this.#formEl.elements];
     this.#formInputErrorEls = [...this.#formEl.querySelectorAll('[data-id$="-error"]')]
     this.#resultEl = this.#formEl.querySelector('[data-id="result"]');
 
@@ -73,6 +75,7 @@ export default class CashbackComponent {
 
     // TODO: sync validation
     this.#clearErrors();
+    this.#resultEl.textContent = '';
 
     this.#formFieldsEl.disabled = true;
     this.#formProgressEl.style.visibility = 'visible';
@@ -89,18 +92,11 @@ export default class CashbackComponent {
         const response = JSON.parse(ev.target.responseText);
 
         if (ev.target.status >= 200 && xhr.status <= 299) {
-          if (!response.hasOwnProperty('result')) {
-            throw new Error('bad response - no result property');
-          }
-          if (typeof response.result !== 'number') {
-            throw new Error('bad resposne - wrong result type');
-          }
-          this.#resultEl.textContent = `${response.result} rub.`;
-        } else {
-          const errorText = this.#errorTranslator.translate(response.error);
-          this.#formErrorEl.textContent = errorText;
+          this.#handleSuccess(response);
+          return;
         }
 
+        this.#handleError(response);
       } catch (e) {
         // TODO: add error tracing
         this.#formErrorEl.textContent = this.#errorTranslator.translate();
@@ -119,6 +115,7 @@ export default class CashbackComponent {
         this.#formFieldsEl.disabled = false;
         this.#formProgressEl.style.visibility = 'hidden';
         this.#setProgress(0);
+        this.#focusOnFirstInvalidInput();
       }, 2000);
     };
     xhr.send(); // stop the world!
@@ -126,7 +123,46 @@ export default class CashbackComponent {
 
   #clearErrors() {
     this.#formErrorEl.textContent = '';
+    this.#formInputEls.forEach((el) => {
+      el.dataset.status = '';
+      el.classList.remove('field-error');
+    });
     this.#formInputErrorEls.forEach((el) => el.textContent = '');
+  }
+
+  #handleSuccess(response) {
+    if (typeof response.result !== 'number') {
+      throw new Error('bad resposne - wrong result type');
+    }
+    this.#resultEl.textContent = `${response.result} rub.`;
+  }
+
+  #handleError(response) {
+    const errorText = this.#errorTranslator.translate(response.error);
+    this.#formErrorEl.textContent = errorText;
+
+    if (typeof response.errors === 'object') {
+      for (const [key, value] of Object.entries(response.errors)) {
+        const inputEl = this.#formInputEls.find((el) => el.name === key);
+        const errorEl = this.#formInputErrorEls.find((el) => el.dataset.name === key);
+        const errorInputText = this.#errorTranslator.translate(value);
+
+        if (typeof inputEl !== 'undefined') {
+          inputEl.classList.add('field-error');
+          inputEl.dataset.status = 'error';
+        }
+        if (typeof errorEl !== 'undefined') {
+          errorEl.textContent = errorInputText;
+        }
+      }
+    }
+  }
+
+  #focusOnFirstInvalidInput() {
+    const firstInvalidInputEl = this.#formInputEls.find((el) => el.dataset.status === 'error');
+    if (typeof firstInvalidInputEl !== 'undefined') {
+      firstInvalidInputEl.focus();
+    }
   }
 
   #scheduleProgress() {
