@@ -24,6 +24,7 @@ template.innerHTML = `
       <div data-id="result"></div>
     </fieldset>
   </form>
+  <div data-id="form-error"></div>
 </div>
 `;
 
@@ -34,12 +35,12 @@ export default class CashbackComponent {
   #cashbackService;
 
   #formEl;
-  #formProgressEl;
   #formFieldsEl;
-  #formProgress = 0;
+  #formInputErrorEls;
 
-  #amountInputEl;
-  #amountErrorEl;
+  #formProgressEl;
+  #formProgress = 0;
+  #formErrorEl;
   #resultEl;
 
   constructor(parentEl, cashbackService) {
@@ -54,11 +55,10 @@ export default class CashbackComponent {
     this.#formEl.addEventListener('submit', (ev) => this.handleFormSubmit(ev));
     this.#formProgressEl = this.#formEl.querySelector('[data-id="form-progress"]');
     this.#formFieldsEl = this.#formEl.querySelector('[data-id="form-fields"]');
-
-    this.#amountInputEl = this.#formEl.querySelector('[data-id="amount"]');
-    this.#amountErrorEl = this.#formEl.querySelector('[data-id="amount-error"]');
-
+    this.#formInputErrorEls = [...this.#formEl.querySelectorAll('[data-id$="-error"]')]
     this.#resultEl = this.#formEl.querySelector('[data-id="result"]');
+
+    this.#formErrorEl = this.#el.querySelector('[data-id="form-error"]');
 
     this.render();
   }
@@ -70,6 +70,8 @@ export default class CashbackComponent {
     const urlSearchParams = new URLSearchParams(formData);
 
     // TODO: sync validation
+    this.#clearErrors();
+
     this.#formFieldsEl.disabled = true;
     this.#formProgressEl.style.visibility = 'visible';
     this.#setProgress(10);
@@ -77,11 +79,6 @@ export default class CashbackComponent {
 
     const xhr = new XMLHttpRequest();
     xhr.open('GET', `http://localhost:9999/?${urlSearchParams.toString()}`);
-    setTimeout(() => {
-      // TODO...
-    }, 500);
-    // setInterval(cb, 1000);
-    xhr.send();
 
     // response from server
     // 200, 400, 500, etc
@@ -92,8 +89,8 @@ export default class CashbackComponent {
       // TODO:
     };
     // network error
-    xhr.onerror = () => {
-      // TODO:
+    xhr.onerror = (ev) => {
+      this.#formErrorEl.textContent = 'Error, please try again later';
     };
     xhr.onloadend = () => {
       // Bad practice (refactor)
@@ -106,6 +103,11 @@ export default class CashbackComponent {
       }, 2000);
     };
     xhr.send(); // stop the world!
+  }
+
+  #clearErrors() {
+    this.#formErrorEl.textContent = '';
+    this.#formInputErrorEls.forEach((el) => el.textContent = '');
   }
 
   #scheduleProgress() {
