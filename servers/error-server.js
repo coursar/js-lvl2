@@ -7,7 +7,20 @@ const handler = (req, res) => {
 
   const url = new URL(req.url, `http://${req.headers.host}`);
 
-  const amount = url.searchParams.get('amount');
+  const amount = Number.parseInt(url.searchParams.get('amount'), 10);
+
+  if (Number.isNaN(amount)) {
+    res.statusCode = 400;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({
+      status: 'error',
+      error: 'err.client',
+      errors: {
+        'amount': 'err.should_be_number',
+      },
+    }));
+    return;
+  }
 
   if (counter % 2 === 0) {
     res.statusCode = 500;
@@ -19,10 +32,13 @@ const handler = (req, res) => {
     return;
   }
 
+  const result = amount * 0.05;
+
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify({
     status: 'ok',
+    result, // shorthand properties -> result: result
   }));
 };
 

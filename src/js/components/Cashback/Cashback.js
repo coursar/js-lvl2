@@ -85,17 +85,26 @@ export default class CashbackComponent {
     // response from server
     // 200, 400, 500, etc
     xhr.onload = (ev) => {
-      if (ev.target.status >= 200 && xhr.status <= 299) {
-        // TODO:
-      }
-      // TODO: 4xx-5xx
       try {
         const response = JSON.parse(ev.target.responseText);
-        const errorText = this.#errorTranslator.translate(response.error);
-        this.#formErrorEl.textContent = errorText;
-        return;
-      } catch (e) {
 
+        if (ev.target.status >= 200 && xhr.status <= 299) {
+          if (!response.hasOwnProperty('result')) {
+            throw new Error('bad response - no result property');
+          }
+          if (typeof response.result !== 'number') {
+            throw new Error('bad resposne - wrong result type');
+          }
+          this.#resultEl.textContent = `${response.result} rub.`;
+        } else {
+          const errorText = this.#errorTranslator.translate(response.error);
+          this.#formErrorEl.textContent = errorText;
+        }
+
+      } catch (e) {
+        // TODO: add error tracing
+        this.#formErrorEl.textContent = this.#errorTranslator.translate();
+        console.error(e);
       }
     };
 
