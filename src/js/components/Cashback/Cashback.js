@@ -1,7 +1,9 @@
+import { amountValidatorFn } from "../../validators/Validators.js";
+
 const template = document.createElement('template');
 template.innerHTML = `
 <div data-widget="cashback-calculator">
-  <form data-id="form">
+  <form data-id="form" novalidate>
     <div data-id="form-progress" class="progress">0%</div>
     <fieldset data-id="form-fields">
       <div>
@@ -39,6 +41,9 @@ export default class CashbackComponent {
   #formFieldsEl;
   #formInputEls;
   #formInputErrorEls;
+  #formInputValidators = Object.freeze({
+    amount: [amountValidatorFn],
+  });
 
   #formProgressEl;
   #formProgress = 0;
@@ -72,12 +77,24 @@ export default class CashbackComponent {
     ev.preventDefault();
     // const formData = new FormData(ev.target);
     // const urlSearchParams = new URLSearchParams(formData);
-    const kvPairs = Array.from(ev.target.elements)
+
+    // TODO: sync validation
+
+    for (const inputEl of this.#formInputEls) {
+      const validators = this.#formInputValidators[inputEl.name] ?? [];
+      const error = validators.find((validator) => validator(inputEl));
+      if (typeof error !== 'undefined') {
+        inputEl.setCustomValidity(this.#errorTranslator.translate(error.code));
+        this.#formEl.reportValidity();
+        return;
+      }
+    }
+
+    const kvPairs = this.#formInputEls
       .filter((el) => el.name !== '')
       .map((el) => [el.name, el.value.trim()]) // TODO: validation
     const requestBody = Object.fromEntries(kvPairs);
 
-    // TODO: sync validation
     this.#clearErrors();
     this.#resultEl.textContent = '';
 
