@@ -67,7 +67,7 @@ export default class CashbackComponent {
     this.render();
   }
 
-  handleFormSubmit(ev) {
+  async handleFormSubmit(ev) {
     // default behaviour
     ev.preventDefault();
     const formData = new FormData(ev.target);
@@ -81,34 +81,18 @@ export default class CashbackComponent {
     this.#formProgressEl.style.visibility = 'visible';
     this.#setProgress(10);
     this.#scheduleProgress();
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', `http://localhost:9999/?${urlSearchParams.toString()}`);
-
-    // response from server
-    // 200, 400, 500, etc
-    xhr.onload = (ev) => {
-      try {
-        const response = JSON.parse(ev.target.responseText);
-
-        if (ev.target.status >= 200 && xhr.status <= 299) {
-          this.#handleSuccess(response);
-          return;
-        }
-
-        this.#handleError(response);
-      } catch (e) {
-        // TODO: add error tracing
-        this.#formErrorEl.textContent = this.#errorTranslator.translate();
-        console.error(e);
+    try {
+      const response = await fetch(`http://localhost:9999/?${urlSearchParams.toString()}`);
+      const responseData = await response.json();
+      if (!response.ok) {
+        this.#handleError(responseData);
+        return;
       }
-    };
-
-    xhr.onerror = (ev) => {
+      this.#handleSuccess(responseData);
+    } catch (e) {
+      console.error(e);
       this.#formErrorEl.textContent = this.#errorTranslator.translate();
-    };
-    xhr.onloadend = () => {
-      // Bad practice (refactor)
+    } finally {
       this.#formProgressEl.style.transitionTimingFunction = 'ease';
       this.#setProgress(100);
       setTimeout(() => {
@@ -117,8 +101,7 @@ export default class CashbackComponent {
         this.#setProgress(0);
         this.#focusOnFirstInvalidInput();
       }, 2000);
-    };
-    xhr.send(); // stop the world!
+    }
   }
 
   #clearErrors() {
