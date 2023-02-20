@@ -70,8 +70,12 @@ export default class CashbackComponent {
   async handleFormSubmit(ev) {
     // default behaviour
     ev.preventDefault();
-    const formData = new FormData(ev.target);
-    const urlSearchParams = new URLSearchParams(formData);
+    // const formData = new FormData(ev.target);
+    // const urlSearchParams = new URLSearchParams(formData);
+    const kvPairs = Array.from(ev.target.elements)
+      .filter((el) => el.name !== '')
+      .map((el) => [el.name, el.value.trim()]) // TODO: validation
+    const requestBody = Object.fromEntries(kvPairs);
 
     // TODO: sync validation
     this.#clearErrors();
@@ -82,7 +86,13 @@ export default class CashbackComponent {
     this.#setProgress(10);
     this.#scheduleProgress();
     try {
-      const response = await fetch(`http://localhost:9999/?${urlSearchParams.toString()}`);
+      const response = await fetch(`http://localhost:9999`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
       const responseData = await response.json();
       if (!response.ok) {
         this.#handleError(responseData);

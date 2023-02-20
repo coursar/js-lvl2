@@ -56,11 +56,16 @@ const cors = (next) => (req, res) => {
     'Access-Control-Allow-Headers': '*',
   };
 
-  Object.entries(headers).forEach(([k, v]) => {
-    res.setHeader(k, v);
-  });
+  if (req.method !== 'OPTIONS') {
+    Object.entries(headers).forEach(([k, v]) => res.setHeader(k, v));
+    next(req, res);
+    return;
+  }
 
-  next(req, res);
+  // req.method === OPTIONS
+  Object.entries(headers).forEach(([k, v]) => res.setHeader(k, v));
+  res.statusCode = 204;
+  res.end();
 };
 
 const slow = (next, timeout) => (req, res) => {
