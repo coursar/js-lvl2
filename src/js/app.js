@@ -67,11 +67,18 @@ const fileInputEl = document.querySelector('[data-id="file-input"]');
 fileInputEl.addEventListener('change', async (evt) => {
   const files = [...evt.target.files];
 
-  const [firstFile] = files;
+  const [imageFile] = files;
+  const jsonFile = new Blob(['{"id": "sample"}'], { type: 'application/json' });
+
+  const formData = new FormData();
+  formData.append('file', imageFile, 'firstfile.png');
+  formData.append('amount', '1000');
+  formData.append('json', jsonFile);
+
   try {
     const response = await fetch('http://localhost:9999', {
       method: 'POST',
-      body: firstFile,
+      body: formData,
     });
 
     const responseData = await response.json();

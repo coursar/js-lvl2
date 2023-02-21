@@ -2,10 +2,12 @@ import http from 'node:http';
 import fs from 'node:fs';
 
 const handler = (req, res) => {
-  // TODO: define extension
-  fs.writeFile('images/image.png', req.body, (err) => {
-    // TODO handle error
-  });
+  if (req.bodyType?.startsWith('image/')) {
+    // TODO: define extension
+    fs.writeFile('images/image.png', req.body, (err) => {
+      // TODO handle error
+    });
+  }
 
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
