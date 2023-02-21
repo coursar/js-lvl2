@@ -69,17 +69,9 @@ fileInputEl.addEventListener('change', async (evt) => {
 
   const [firstFile] = files;
   try {
-    const text = await firstFile.text();
-    contentEl.textContent = text;
-
     const response = await fetch('http://localhost:9999', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        content: text,
-      }),
+      body: firstFile,
     });
 
     const responseData = await response.json();
