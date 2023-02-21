@@ -1,3 +1,7 @@
+label {
+  user-select: none;
+}
+
 fieldset {
   border: none;
   margin: 0;

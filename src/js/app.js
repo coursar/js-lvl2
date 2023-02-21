@@ -1,9 +1,17 @@
-import ErrorTranslator from './errors/ErrorsTranslator.js';
-import CashbackService from './services/CashbackService/CashbackService.js';
-import CashbackComponent from './components/Cashback/Cashback.js';
-
-const errorTranslator = new ErrorTranslator();
-const cashbackService = new CashbackService();
-
 const rootEl = document.querySelector('#root');
-const cashbackEl = new CashbackComponent(rootEl, cashbackService, errorTranslator);
+rootEl.innerHTML = `
+<form>
+  <div>
+    <label for="text-input">Some text</label>
+    <input data-id="text-input" id="text-input" type="text">
+  </div>
+  <div>
+    <label>
+      <input data-id="checkbox-input" type="checkbox"> Check me
+    </label>
+  </div>
+  <div>
+    <input data-id="file-input" type="file">
+  </div>
+</form>
+`;
