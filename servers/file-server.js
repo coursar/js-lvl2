@@ -1,19 +1,38 @@
 import http from 'node:http';
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 
 const handler = (req, res) => {
   if (req.bodyType?.startsWith('image/')) {
     // TODO: define extension
-    fs.writeFile('images/image.png', req.body, (err) => {
+    const uuid = crypto.randomUUID();
+    const filename = `images/${uuid}.png`;
+
+    fs.writeFile(filename, req.body, (err) => {
+      if (err) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({
+          status: 'error',
+        }));
+        return;
+      }
+
       // TODO handle error
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({
+        status: 'ok',
+        filename,
+      }));
     });
+    return;
   }
 
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify({
     status: 'ok',
-    // result, // shorthand properties -> result: result
   }));
 };
 

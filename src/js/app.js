@@ -68,22 +68,32 @@ fileInputEl.addEventListener('change', async (evt) => {
   const files = [...evt.target.files];
 
   const [imageFile] = files;
-  const jsonFile = new Blob(['{"id": "sample"}'], { type: 'application/json' });
-
-  const formData = new FormData();
-  formData.append('file', imageFile, 'firstfile.png');
-  formData.append('amount', '1000');
-  formData.append('json', jsonFile);
 
   try {
-    const response = await fetch('http://localhost:9999', {
+    const imageResponse = await fetch('http://localhost:9999', {
       method: 'POST',
-      body: formData,
+      body: imageFile,
     });
 
-    const responseData = await response.json();
-    debugger;
+    const imageResponseData = await imageResponse.json();
+    // TODO: check status === 'ok';
+    const {filename} = imageResponseData;
 
+    // TODO: check error
+    const objectResponse = await fetch('http://localhost:9999', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: 0,
+        name: 'some name',
+        filename,
+      }),
+    });
+
+    const objectResponseData = await objectResponse.json();
+    debugger;
   } catch (e) {
     console.error(e);
   }
