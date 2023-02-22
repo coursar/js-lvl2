@@ -1,3 +1,7 @@
+const state = {
+  failedFiles: [],
+};
+
 const rootEl = document.querySelector('#root');
 rootEl.innerHTML = `
 <div>
@@ -16,7 +20,10 @@ rootEl.innerHTML = `
     </div>
   </form>
   <div data-id="drop-area" class="drop-area"></div>
-  <ul data-id="failed-files"></ul>
+  <div data-id="failed-files">
+    <ul data-id="failed-files-list"></ul>
+    <button data-action="retry" style="visibility: hidden">Retry</button>
+  </div>
   <div data-id="content"></div>
 </div>
 `;
@@ -26,7 +33,8 @@ const contentEl = document.querySelector('[data-id="content"]');
 const inputEl = document.querySelector('[data-id="text-input"]');
 
 // Solutions:
-//  1. Manual Fix Error by User
+//  1. Manual Fix Error by User + Switch to Components/state
+//  2. No recursion
 // Questions:
 // ->  2. Multple files
 const uploadFile = async(file) => {
@@ -55,33 +63,32 @@ const uploadFiles = async(files) => {
   .filter((result) => result.status === 'rejected')
   .map((result) => result.file);
 
-  if (failedFiles.length === 0) {
-    return;
-  }
-
   // FIXME:
   showFailedFiles(failedFiles);
-  // console.log('next iteration');
-  // await uploadFiles(failedFiles);
 }
 
 const failedFilesEl = document.querySelector('[data-id="failed-files"]');
+const failedFilesListEl = failedFilesEl.querySelector('[data-id="failed-files-list"]');
+const failedFilesRetryEl = failedFilesEl.querySelector('[data-action="retry"]');
 const showFailedFiles = (failedFiles) => {
-  failedFilesEl.append(...failedFiles.map((file) => {
+  failedFilesListEl.innerHTML = '';
+  if (failedFiles.length === 0) {
+    failedFilesRetryEl.style.visibility = 'hidden';
+    return;
+  }
+
+  // TODO: check size
+  failedFilesListEl.append(...failedFiles.map((file) => {
     const fileEl = document.createElement('li');
     fileEl.innerHTML = `
-    ${file.name} failed <button data-action="retry">Retry</button>
+    ${file.name} failed
     `;
-    fileEl.querySelector('[data-action="retry"]').addEventListener('click', async (evt) => {
-      try {
-        await uploadFile(file);
-        fileEl.remove();
-      } catch(e) {
-        console.error(e);
-      }
-    });
     return fileEl;
-  }))
+  }));
+  failedFilesRetryEl.style.visibility = 'visible';
+  failedFilesRetryEl.onclick = (evt) => {
+    uploadFiles(failedFiles);
+  };
 };
 
 const fileInputEl = document.querySelector('[data-id="file-input"]');
