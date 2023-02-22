@@ -15,6 +15,8 @@ rootEl.innerHTML = `
       <input data-id="file-input" type="file">
     </div>
   </form>
+  <div data-id="drop-area" class="drop-area"></div>
+  <ul data-id="failed-files"></ul>
   <div data-id="content"></div>
 </div>
 `;
@@ -22,63 +24,85 @@ rootEl.innerHTML = `
 const contentEl = document.querySelector('[data-id="content"]');
 
 const inputEl = document.querySelector('[data-id="text-input"]');
-// change - only on loosing focus (click or tab)
-// input
-// inputEl.addEventListener('change', (evt) => {
-//   evt.target.value = evt.target.value.trim().toUpperCase();
-// });
 
+// Solutions:
+//  1. Manual Fix Error by User
+// Questions:
+// ->  2. Multple files
+const uploadFile = async(file) => {
+  const fileResponse = await fetch('http://localhost:9999', {
+    method: 'POST',
+    body: file,
+  });
 
-// Good: Autocomplete + Async Validation -> ^...$
-// Think about: Input Mask:
-// - Ctrl+V
-// - Delete/BackSpace
-// let validInput = inputEl.value;
-// inputEl.addEventListener('input', (evt) => {
-//   if (!/^[0-9]*$/.test(inputEl.value)) {
-//     inputEl.value = validInput;
-//     return;
-//   }
+  if (!fileResponse.ok) {
+    throw new Error('...');
+  }
 
-//   if (evt.data === null) {
-//     validInput = inputEl.value;
-//     return;
-//   }
+  const fileResponseData = await fileResponse.json();
 
-//   if (!/[0-9]/.test(evt.data)) {
-//     inputEl.value = validInput;
-//     return;
-//   }
+  // TODO: check status === 'ok';
+  const { filename } = fileResponseData;
+  return filename;
+};
 
-//   validInput = inputEl.value;
-// });
+const uploadFiles = async(files) => {
+  const results = await Promise.allSettled(files.map(uploadFile));
+  const failedFiles = results.map((result, index) => ({
+      status: result.status,
+      file: files[index],
+  }))
+  .filter((result) => result.status === 'rejected')
+  .map((result) => result.file);
 
-// inputEl.addEventListener('keydown', (evt) => {
-//   evt.preventDefault();
-//   debugger;
-// });
+  if (failedFiles.length === 0) {
+    return;
+  }
 
-// const checkboxEl = document.querySelector('[data-id="checkbox-input"]');
-// checkboxEl.addEventListener('change', (evt) => {
-//   debugger;
-// });
+  // FIXME:
+  showFailedFiles(failedFiles);
+  // console.log('next iteration');
+  // await uploadFiles(failedFiles);
+}
+
+const failedFilesEl = document.querySelector('[data-id="failed-files"]');
+const showFailedFiles = (failedFiles) => {
+  failedFilesEl.append(...failedFiles.map((file) => {
+    const fileEl = document.createElement('li');
+    fileEl.innerHTML = `
+    ${file.name} failed <button data-action="retry">Retry</button>
+    `;
+    fileEl.querySelector('[data-action="retry"]').addEventListener('click', async (evt) => {
+      try {
+        await uploadFile(file);
+        fileEl.remove();
+      } catch(e) {
+        console.error(e);
+      }
+    });
+    return fileEl;
+  }))
+};
 
 const fileInputEl = document.querySelector('[data-id="file-input"]');
 fileInputEl.addEventListener('change', async (evt) => {
-  const files = [...evt.target.files];
+  const files = Array.from(evt.target.files);
+  const result = await uploadFiles(files);
+  evt.target.value = ''; // clear selected files
+});
 
-  const [imageFile] = files;
+const dropAreaEl = document.querySelector('[data-id="drop-area"]');
+dropAreaEl.addEventListener('dragover', (evt) => {
+  evt.preventDefault();
+});
 
-  try {
-    const imageResponse = await fetch('http://localhost:9999', {
-      method: 'POST',
-      body: imageFile,
-    });
+dropAreaEl.addEventListener('drop', async (evt) => {
+  evt.preventDefault();
+  const files = Array.from(evt.dataTransfer.files);
+  const result = await uploadFiles(files);
+});
 
-    const imageResponseData = await imageResponse.json();
-    // TODO: check status === 'ok';
-    const {filename} = imageResponseData;
-
+/*
     // TODO: check error
     const objectResponse = await fetch('http://localhost:9999', {
       method: 'POST',
@@ -93,8 +117,4 @@ fileInputEl.addEventListener('change', async (evt) => {
     });
 
     const objectResponseData = await objectResponse.json();
-    debugger;
-  } catch (e) {
-    console.error(e);
-  }
-});
+*/

@@ -37,3 +37,9 @@ fieldset {
   transition: width 500ms ease;
   background-color: #0d6efd;
 }
+
+.drop-area {
+  height: 300px;
+  background-color: #cccccc;
+  border: 2px dashed #0d6efd;
+}
