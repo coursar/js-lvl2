@@ -98,7 +98,7 @@ const image = (next) => (req, res) => {
   });
 };
 
-const server = http.createServer(slow(cors(image(handler)), 3000));
+const server = http.createServer(slow(cors(image(handler)), 5000));
 
 server.on('connection', (socket) => {
   socket.pipe(process.stdout);

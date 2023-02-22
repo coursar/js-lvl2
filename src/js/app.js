@@ -34,9 +34,17 @@ const inputEl = document.querySelector('[data-id="text-input"]');
 
 // Solutions:
 //  1. Manual Fix Error by User + Switch to Components/state
-//  2. No recursion
-// Questions:
-// ->  2. Multple files
+//  2. No recursion:
+//    2.1. Exit
+//    2.2. Number of calls (3-5)
+//    2.3. setTimeout(), 1-3-6-...-30/60 <-
+//  3. XHR/fetch regular requests (WAF)
+// Polling -> setTimeout()/setInterval()
+// Long-Polling
+// SSE - Server Sent Events (browser <- server)
+// WebSockets - (browser <-> server)
+// WebRTC - audio/video
+// WebTransport (draft)
 const uploadFile = async(file) => {
   const fileResponse = await fetch('http://localhost:9999', {
     method: 'POST',
