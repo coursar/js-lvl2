@@ -43,3 +43,7 @@ fieldset {
   background-color: #cccccc;
   border: 2px dashed #0d6efd;
 }
+
+.hidden {
+  display: none;
+}
