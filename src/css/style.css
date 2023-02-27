@@ -47,3 +47,24 @@ fieldset {
 .hidden {
   display: none;
 }
+
+.file-selector {
+  position: relative;
+  display: block;
+  width: 300px;
+  height: 30px;
+}
+
+input[type="file"] {
+  opacity: 0.1;
+}
+
+.file-selector .hider {
+  position: absolute;
+  display: block;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+}
