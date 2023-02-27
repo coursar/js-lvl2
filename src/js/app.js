@@ -4,18 +4,18 @@ rootEl.innerHTML = `
 
 <div class="file-selector">
   <input data-id="file" type="file">
-  <span class="hider"></span>
+  <span class="hider">Click to choose file</span>
 </div>
 `;
 
-const fileEl = rootEl.querySelector('[data-id="file"]');
+// const fileEl = rootEl.querySelector('[data-id="file"]');
 
-const buttonEl = rootEl.querySelector('[data-id="upload"]');
-buttonEl.addEventListener('click', (evt) => {
-  // 1. user activation
-  fileEl.click();
-});
+// const buttonEl = rootEl.querySelector('[data-id="upload"]');
+// buttonEl.addEventListener('click', (evt) => {
+//   // 1. user activation
+//   fileEl.click();
+// });
 
-fileEl.addEventListener('change', (evt) => {
-  debugger;
-});
+// fileEl.addEventListener('change', (evt) => {
+//   debugger;
+// });
