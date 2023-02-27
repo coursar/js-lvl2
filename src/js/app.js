@@ -32,34 +32,54 @@ const contentEl = document.querySelector('[data-id="content"]');
 
 const inputEl = document.querySelector('[data-id="text-input"]');
 
-// Solutions:
-//  1. Manual Fix Error by User + Switch to Components/state
-//  2. No recursion:
-//    2.1. Exit
-//    2.2. Number of calls (3-5)
-//    2.3. setTimeout(), 1-3-6-...-30/60 <-
-//  3. XHR/fetch regular requests (WAF)
-// Polling -> setTimeout()/setInterval()
-// Long-Polling
-// SSE - Server Sent Events (browser <- server)
-// WebSockets - (browser <-> server)
-// WebRTC - audio/video
-// WebTransport (draft)
 const uploadFile = async(file) => {
-  const fileResponse = await fetch('http://localhost:9999', {
-    method: 'POST',
-    body: file,
-  });
+  // 1mb-2mb, 10mb
 
-  if (!fileResponse.ok) {
-    throw new Error('...');
+  const partSize = 1 * 1024 * 1024;
+  const parts = Math.ceil(file.size / partSize);
+  let completePart = 0;
+  try {
+    for (let i = 0; i < parts; i++) {
+      const start = i * partSize;
+      const end = Math.min((i + 1) * partSize, file.size);
+      const slice = await file.slice(start, end, 'image/png');
+      const fileResponse = await fetch('http://localhost:9999', {
+        method: 'POST',
+        headers: {
+          'X-Parts': parts,
+          'X-TotalSize': file.size,
+          'X-PartNo': i,
+        },
+        body: slice,
+      });
+
+      if (!fileResponse.ok) {
+        throw new Error('...');
+      }
+
+      const fileResponseData = await fileResponse.json();
+
+      // TODO: check status === 'ok';
+      const { filename } = fileResponseData;
+      console.log(filename);
+
+      completePart++;
+    }
+  } catch (e) {
+    // show controls for retry
   }
 
-  const fileResponseData = await fileResponse.json();
+  // 1. Initial Request: parts, totalSize
+  //    Response: id
+  // 2. For each part Request: id, partNo, blob
+  //    Response: ...
+  // 3. Finish Request: id
+  //    Response: URL/path of joined file
 
-  // TODO: check status === 'ok';
-  const { filename } = fileResponseData;
-  return filename;
+  // For first part: Header: initial request, parts, totalSize, partNo 0 -> id
+  // For ...
+  // For last part: Header: partNo 100, parts: 100
+
 };
 
 const uploadFiles = async(files) => {
@@ -75,29 +95,9 @@ const uploadFiles = async(files) => {
   showFailedFiles(failedFiles);
 }
 
-const failedFilesEl = document.querySelector('[data-id="failed-files"]');
-const failedFilesListEl = failedFilesEl.querySelector('[data-id="failed-files-list"]');
-const failedFilesRetryEl = failedFilesEl.querySelector('[data-action="retry"]');
-const showFailedFiles = (failedFiles) => {
-  failedFilesListEl.innerHTML = '';
-  if (failedFiles.length === 0) {
-    failedFilesRetryEl.style.visibility = 'hidden';
-    return;
-  }
-
-  // TODO: check size
-  failedFilesListEl.append(...failedFiles.map((file) => {
-    const fileEl = document.createElement('li');
-    fileEl.innerHTML = `
-    ${file.name} failed
-    `;
-    return fileEl;
-  }));
-  failedFilesRetryEl.style.visibility = 'visible';
-  failedFilesRetryEl.onclick = (evt) => {
-    uploadFiles(failedFiles);
-  };
-};
+// 1. UI
+// 2. Loading
+// 3. Error (Sync Validation & Network) & Retry
 
 const fileInputEl = document.querySelector('[data-id="file-input"]');
 fileInputEl.addEventListener('change', async (evt) => {

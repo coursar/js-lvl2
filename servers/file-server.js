@@ -5,14 +5,14 @@ import crypto from 'node:crypto';
 let count = 1;
 
 const handler = (req, res) => {
-  if (count++ % 2 === 0) {
-    res.statusCode = 400;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({
-      status: 'error',
-    }));
-    return;
-  }
+  // if (count++ % 2 === 0) {
+  //   res.statusCode = 400;
+  //   res.setHeader('Content-Type', 'application/json');
+  //   res.end(JSON.stringify({
+  //     status: 'error',
+  //   }));
+  //   return;
+  // }
 
   if (req.bodyType?.startsWith('image/')) {
     // TODO: define extension
