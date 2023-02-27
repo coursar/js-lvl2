@@ -2,8 +2,10 @@ const rootEl = document.querySelector('#root');
 rootEl.innerHTML = `
 <button data-id="upload">Upload File</button>
 
+<label for="file">Click me</label>
+
 <div class="file-selector">
-  <input data-id="file" type="file">
+  <input id="file" data-id="file" type="file">
   <span class="hider">Click to choose file</span>
 </div>
 `;

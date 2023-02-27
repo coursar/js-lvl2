@@ -68,5 +68,4 @@ input[type="file"] {
   right: 0;
   background: #ffffff;
   user-select: none;
-  pointer-events: none;
 }
