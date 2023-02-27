@@ -8,6 +8,8 @@ rootEl.innerHTML = `
 const imgEl = rootEl.querySelector('[data-id="preview"]');
 
 const linkEl = rootEl.querySelector('[data-id="download"]');
+const ghostEl = rootEl.querySelector('[data-id="ghost"]');
+
 linkEl.addEventListener('click', (evt) => {
   evt.preventDefault();
 
@@ -18,11 +20,18 @@ linkEl.addEventListener('click', (evt) => {
 
   xhr.onload = (evt) => {
     const url = URL.createObjectURL(evt.target.response); // blob
-    imgEl.src = url;
-    imgEl.onload = (evt) => {
-      URL.revokeObjectURL(url);
-    };
-    debugger;
-  };
+    ghostEl.href = url;
+    ghostEl.download = 'image.png';
+    // v1
+    // ghostEl.click();
+    // v2
+    ghostEl.dispatchEvent(new PointerEvent('click', {}));
 
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 60000);
+  };
+});
+
+ghostEl.addEventListener('click', (evt) => {
 });
